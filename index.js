@@ -5,19 +5,29 @@ mongoose.connect('mongodb://localhost/buoc')
     .catch(err => console.error('Could not connect to MongoDB...', err));
 
 const eventSchema = new mongoose.Schema({
-    title: String,
-    date: { type: Date, default: Date.now },
+    title: {
+        type: String,
+        required: true,
+        maxLength: 50
+    },
+    date: { type: Date, required: true },
 });
 
 const Event = mongoose.model('Event', eventSchema);
 
 async function createEvent() {
     const event = new Event({
-        title: 'Mt. Willard',
+        title: 'Mt. Major',
+        date: new Date('September 13, 2024')
     });
     
-    const result = await event.save();
-    console.log(result);
+    try {
+        const result = await event.save();
+        console.log(result);
+    }
+    catch(ex) {
+        console.log(ex.message);
+    }
 }
 
 async function getEvents() {
@@ -25,4 +35,4 @@ async function getEvents() {
     console.log(events);
 }
 
-getEvents();
+createEvent();
