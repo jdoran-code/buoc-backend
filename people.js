@@ -69,28 +69,44 @@ async function getPerson(nameStr, emailStr) {
     console.log(person);
 }
 
-async function updatePerson(id, updateKey) {
-    /*
-    updateKey === 0 -> Made a member
-    === 1 -> Waitlisted for trip
-    === 2 -> Attended a meeting
-    */
+async function updateMembership(id) {
     const person = await Person.findById(id);
-    if (!person || updateKey >= 3) return;
+    if (!person) return;
 
-    if (updateKey === 0) {
-        person.isMember = true;
-        person.points += 5;
-    } else if (updateKey === 1) {
+    person.isMember = true;
+    person.points += 5;
+
+    const result = await person.save();
+    console.log(result);
+}
+
+async function updateWaitlists(id, addingWaitlist) {
+    const person = await Person.findById(id);
+    if (!person) return;
+
+    if (addingWaitlist) {
         person.numWaitlists += 1;
         person.points += 4;
     } else {
-        person.meetingsAttended += 1;
-        person.points += 3;
+        if (person.numWaitlists === 0 || person.points - 4 < 0) return;
+
+        person.numWaitlists -= 1;
+        person.points -= 4;
     }
 
     const result = await person.save();
     console.log(result);
 }
 
-updatePerson('66c502f28dff5f56865bd78c', 0);
+async function updateMeetings(id) {
+    const person = await Person.findById(id);
+    if (!person) return;
+
+    person.meetingsAttended += 1;
+    person.points += 3;
+
+    const result = await person.save();
+    console.log(result);
+}
+
+updateWaitlists('66c8df929d7d09994febf80c', false);
