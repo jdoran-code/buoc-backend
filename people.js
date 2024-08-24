@@ -108,5 +108,3 @@ async function updateMeetings(id) {
     const result = await person.save();
     console.log(result);
 }
-
-updateWaitlists('66c8df929d7d09994febf80c', false);

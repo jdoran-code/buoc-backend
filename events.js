@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const express = require('express');
+const router = express.Router();
 
 mongoose.connect('mongodb://localhost/buoc')
     .then(() => console.log('Connected to MongoDB...'))
@@ -31,6 +33,7 @@ const eventSchema = new mongoose.Schema({
     },
     numSeats: {
         type: Number,
+        min: 1,
         required: function() { return this.isTrip; }
     },
     prospectList: {
@@ -55,84 +58,60 @@ const eventSchema = new mongoose.Schema({
 
 const Event = mongoose.model('Event', eventSchema);
 
-async function createEvent() {
-    const event = new Event({
-        title: 'Acadia',
-        date: new Date('October 8, 2024'),
-        numDays: 3,
-        isTrip: true,
-        signupForm: 0,
-        numSeats: 5,
-        prospectList: [{ name: 'Justin Doran', email: 'jdoran@bu.edu' }, { name: "Bobby Brown", email: 'brown@bu.edu' }],
-        waitlist: [{ name: "Bobby Brown", email: 'brown@bu.edu' }],
-        tripRoster: [{ name: 'Justin Doran', email: 'jdoran@bu.edu' }]
-    });
-    
-    try {
-        const result = await event.save();
-        console.log(result);
-    }
-    catch(ex) {
-        console.log(ex.message);
-    }
-}
-
-async function getEvents() {
+router.get('/', async (req, res) => {
     const events = await Event
         .find()
-        .sort({ date: 1 });
-    console.log(events);
-}
+        .sort({ date: -1 });
+    res.send(events);
+});
 
-async function updateTitle(id, title) {
-    const event = await Event.findById(id);
-    if (!event) return;
+router.post('/', async (req, res) => {
+    let event = new Event({
+        title: req.body.title,
+        date: req.body.date,
+        numDays: req.body.numDays,
+        isTrip: req.body.isTrip,
+        signupForm: req.body.signupForm,
+        numSeats: req.body.numSeats,
+        prospectList: req.body.prospectList,
+        waitlist: req.body.waitlist,
+        tripRoster: req.body.tripRoster
+    });
+    const err = event.validateSync();
+    if (err) return res.status(400).send("Object validation failed.");
 
-    event.title = title;
+    event = await event.save();
+    res.send(event);
+})
 
-    const result = await event.save();
-    console.log(result);
-}
+router.put('/:id', async (req, res) => {
+    let event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).send('There is no event with the given id.');
 
-async function updateDate(id, date) {
-    const event = await Event.findById(id);
-    if (!event) return;
+    if (req.body.title) event.title = req.body.title;
+    if (req.body.date) event.date = req.body.date;
+    if (req.body.numDays) event.numDays = req.body.numDays;
+    if (req.body.numSeats) event.numSeats = req.body.numSeats;
+    if (req.body.waitlist) event.waitlist = req.body.waitlist;
+    if (req.body.tripRoster) event.tripRoster = req.body.tripRoster;
 
-    event.date = date;
+    const err = event.validateSync();
+    if (err) return res.status(400).send("Update validation failed.");
 
-    const result = await event.save();
-    console.log(result);
-}
+    event = await event.save();
+    res.send(event);
+});
 
-async function updateNumDays(id, numDays) {
-    const event = await Event.findById(id);
-    if (!event) return;
+router.delete('/', async (req, res) => {
+    const deletion = await Event.deleteMany({ numDays: { $gt: 0 } });
+    numDeleted = deletion.deletedCount;
+    res.send(`${numDeleted} documents deleted.`);
+});
 
-    event.numDays = numDays;
+router.get('/:id', async (req, res) => {
+    const event = await Event.findById(req.params.id);
+    if (!event) return res.status(404).send('There is no event with the given id.');
+    res.send(event);
+});
 
-    const result = await event.save();
-    console.log(result);
-}
-
-async function updateNumSeats(id, numSeats) {
-    const event = await Event.findById(id);
-    if (!event) return;
-
-    event.numSeats = numSeats;
-
-    const result = await event.save();
-    console.log(result);
-}
-
-async function updateRoster(id) {
-    const event = await Event.findById(id);
-    if (!event || event.tripRoster.length === event.numSeats) return;
-
-    const newPerson = event.waitlist.pop();
-    event.tripRoster.push(newPerson);
-
-    const result = await event.save();
-    console.log(result);
-}
-
-updateRoster('66c8d99b97d762e5b49d42be');
+module.exports = router;
