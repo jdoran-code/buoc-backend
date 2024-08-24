@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
-
-mongoose.connect('mongodb://localhost/buoc')
-    .then(() => console.log('Connected to MongoDB...'))
-    .catch(err => console.error('Could not connect to MongoDB...', err));
+const express = require('express');
+const router = express.Router();
 
 const personSchema = new mongoose.Schema({
     name: {
@@ -44,67 +42,56 @@ const personSchema = new mongoose.Schema({
 
 const Person = mongoose.model('Person', personSchema);
 
-async function createPerson() {
-    const person = new Person({
-        name: 'Justin Doran',
-        email: 'jdoran@bu.edu',
-        isMember: true,
-        numWaitlists: 0,
-        meetingsAttended: 0,
-        points: 0
+router.post('/', async (req, res) => {
+    let person = new Person({
+        name: req.body.name,
+        email: req.body.email,
+        isMember: req.body.isMember,
+        numWaitlists: req.body.numWaitlists,
+        meetingsAttended: req.body.meetingsAttended,
+        points: req.body.points
     });
+    const err = person.validateSync();
+    if (err) return res.status(400).send("Object validation failed.");
 
-    try {
-        const result = await person.save();
-        console.log(person);
-    } catch(ex) {
-        console.log(ex.message);
-    }
-}
+    person = await person.save();
+    res.send(person);
+});
 
-async function getPerson(nameStr, emailStr) {
-    const person = await Person
-        .find({ name: nameStr, email: emailStr })
-        .select({ points: 1 });
-    console.log(person);
-}
+router.put('/:id', async (req, res) => {
+    let person = await Person.findById(req.params.id);
+    if (!person) return res.status(404).send('There is no person with the given id.');
 
-async function updateMembership(id) {
-    const person = await Person.findById(id);
-    if (!person) return;
+    if (req.body.isMember) person.isMember = req.body.isMember;
+    if (req.body.numWaitlists) person.numWaitlists = req.body.numWaitlists;
+    if (req.body.meetingsAttended) person.meetingsAttended = req.body.meetingsAttended;
+    if (req.body.points) person.points = req.body.points;
 
-    person.isMember = true;
-    person.points += 5;
+    const err = person.validateSync();
+    if (err) return res.status(400).send("Update validation failed.");
 
-    const result = await person.save();
-    console.log(result);
-}
+    person = await person.save();
+    res.send(person);
+});
 
-async function updateWaitlists(id, addingWaitlist) {
-    const person = await Person.findById(id);
-    if (!person) return;
-
-    if (addingWaitlist) {
-        person.numWaitlists += 1;
-        person.points += 4;
+router.delete('/', async (req, res) => {
+    const deletion = await Person.deleteMany({ points: { $gte: 0 } });
+    numDeleted = deletion.deletedCount;
+    if (numDeleted === 1) {
+        res.send(`1 document deleted.`);
     } else {
-        if (person.numWaitlists === 0 || person.points - 4 < 0) return;
-
-        person.numWaitlists -= 1;
-        person.points -= 4;
+        res.send(`${numDeleted} documents deleted.`);
     }
+});
 
-    const result = await person.save();
-    console.log(result);
-}
+router.get('/', async (req, res) => {
+    if (!req.body.name || !req.body.email) return res.status(400).send("Invalid query request.");
 
-async function updateMeetings(id) {
-    const person = await Person.findById(id);
-    if (!person) return;
+    const person = await Person
+        .find({ name: req.body.name, email: req.body.email })
+        .select({ name: 1, email: 1, points: 1 });
+    if (person.length === 0) return res.status(404).send('There is no person with the given id.');
+    res.send(person);
+});
 
-    person.meetingsAttended += 1;
-    person.points += 3;
-
-    const result = await person.save();
-    console.log(result);
-}
+module.exports = router;

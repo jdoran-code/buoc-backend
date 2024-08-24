@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const events = require('./events');
+const people = require('./people');
 const express = require('express');
 const app = express();
 
@@ -9,6 +10,7 @@ mongoose.connect('mongodb://localhost/buoc')
 
 app.use(express.json());
 app.use('/api/events', events);
+app.use('/api/people', people);
 
 
 const port = process.env.PORT || 3000;

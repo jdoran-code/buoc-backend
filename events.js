@@ -2,10 +2,6 @@ const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 
-mongoose.connect('mongodb://localhost/buoc')
-    .then(() => console.log('Connected to MongoDB...'))
-    .catch(err => console.error('Could not connect to MongoDB...', err));
-
 const eventSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -82,7 +78,7 @@ router.post('/', async (req, res) => {
 
     event = await event.save();
     res.send(event);
-})
+});
 
 router.put('/:id', async (req, res) => {
     let event = await Event.findById(req.params.id);
@@ -105,7 +101,11 @@ router.put('/:id', async (req, res) => {
 router.delete('/', async (req, res) => {
     const deletion = await Event.deleteMany({ numDays: { $gt: 0 } });
     numDeleted = deletion.deletedCount;
-    res.send(`${numDeleted} documents deleted.`);
+    if (numDeleted === 1) {
+        res.send(`1 document deleted.`);
+    } else {
+        res.send(`${numDeleted} documents deleted.`);
+    }
 });
 
 router.get('/:id', async (req, res) => {
