@@ -99,7 +99,7 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/', async (req, res) => {
-    const deletion = await Event.deleteMany({ numDays: { $gt: 0 } });
+    const deletion = await Event.deleteMany();
     numDeleted = deletion.deletedCount;
     if (numDeleted === 1) {
         res.send(`1 document deleted.`);

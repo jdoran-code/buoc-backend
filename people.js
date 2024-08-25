@@ -75,7 +75,7 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/', async (req, res) => {
-    const deletion = await Person.deleteMany({ points: { $gte: 0 } });
+    const deletion = await Person.deleteMany();
     numDeleted = deletion.deletedCount;
     if (numDeleted === 1) {
         res.send(`1 document deleted.`);
