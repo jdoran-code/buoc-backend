@@ -17,6 +17,7 @@ mongoose.connect('mongodb://localhost/buoc')
     .catch(err => console.error('Could not connect to MongoDB...', err));
 
 app.use(express.json());
+app.use(cors());
 app.use('/api/events', events);
 app.use('/api/people', people);
 app.use('/api/auth', auth);
