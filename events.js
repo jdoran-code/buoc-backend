@@ -3,6 +3,30 @@ const express = require('express');
 const router = express.Router();
 
 const eventSchema = new mongoose.Schema({
+    organizer: {
+        type: String,
+        required: true,
+        validate: {
+            validator: function(v) {
+                if (v.length !== 9) {
+                    return false;
+                }
+              
+                if (v.charAt(0) !== "U") {
+                    return false;
+                }
+              
+                const digits = "0123456789";
+                for (let i = 1; i < 9; i++) {
+                    if (digits.indexOf(v.charAt(i)) === -1) {
+                      return false;
+                    }
+                }
+              
+                return true;
+            }
+        }
+    },
     title: {
         type: String,
         required: true,
@@ -63,6 +87,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     let event = new Event({
+        organizer: req.body.organizer,
         title: req.body.title,
         date: req.body.date,
         numDays: req.body.numDays,
