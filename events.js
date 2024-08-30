@@ -79,10 +79,18 @@ const eventSchema = new mongoose.Schema({
 const Event = mongoose.model('Event', eventSchema);
 
 router.get('/', async (req, res) => {
-    const events = await Event
-        .find()
-        .sort({ date: -1 });
-    res.send(events);
+    if (req.query.organizer) {
+        const events = await Event
+            .find({ organizer: req.query.organizer })
+            .sort({ date: -1 });
+        if (events.length === 0) res.status(404).send("There are no events with the given organizer");
+        res.send(events);
+    } else {
+        const events = await Event
+            .find()
+            .sort({ date: -1 });
+        res.send(events);
+    }
 });
 
 router.post('/', async (req, res) => {
