@@ -42,6 +42,16 @@ const personSchema = new mongoose.Schema({
 
 const Person = mongoose.model('Person', personSchema);
 
+router.get('/', async (req, res) => {
+    if (!req.query.name || !req.query.email) return res.status(400).send("Invalid query request.");
+
+    const person = await Person
+        .find({ name: req.query.name, email: req.query.email })
+        .select({ name: 1, email: 1, points: 1 });
+    if (person.length === 0) return res.status(404).send('There is no person with the given name and email.');
+    res.send(person);
+});
+
 router.post('/', async (req, res) => {
     let person = new Person({
         name: req.body.name,
@@ -82,16 +92,6 @@ router.delete('/', async (req, res) => {
     } else {
         res.send(`${numDeleted} documents deleted.`);
     }
-});
-
-router.get('/', async (req, res) => {
-    if (!req.body.name || !req.body.email) return res.status(400).send("Invalid query request.");
-
-    const person = await Person
-        .find({ name: req.body.name, email: req.body.email })
-        .select({ name: 1, email: 1, points: 1 });
-    if (person.length === 0) return res.status(404).send('There is no person with the given id.');
-    res.send(person);
 });
 
 module.exports = router;
