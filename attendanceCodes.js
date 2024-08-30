@@ -15,6 +15,15 @@ const attendanceCodeSchema = new mongoose.Schema({
 
 const AttendanceCode = mongoose.model('AttendanceCode', attendanceCodeSchema);
 
+router.get('/', async (req, res) => {
+    const attendanceCode = await AttendanceCode
+        .find()
+        .sort({ date: -1 })
+        .limit(1)
+        .select({ _id: 0, code: 1 });
+    res.send(attendanceCode);
+});
+
 router.post('/', async (req, res) => {
     let attendanceCode = new AttendanceCode({
         date: new Date(),
@@ -24,12 +33,6 @@ router.post('/', async (req, res) => {
     if (err) return res.status(400).send("Object validation failed.");
 
     attendanceCode = await attendanceCode.save();
-    res.send(attendanceCode);
-});
-
-router.get('/:id', async (req, res) => {
-    const attendanceCode = await AttendanceCode.findById(req.params.id);
-    if (!attendanceCode) return res.status(404).send('There is no attendance code with the given id.');
     res.send(attendanceCode);
 });
 
