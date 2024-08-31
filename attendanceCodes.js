@@ -9,7 +9,8 @@ const attendanceCodeSchema = new mongoose.Schema({
     },
     code: {
         type: Number,
-        required: true
+        required: true,
+        min: 0
     }
 });
 
@@ -27,7 +28,7 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     let attendanceCode = new AttendanceCode({
         date: new Date(),
-        code: Math.floor(Math.random() * (1000000 - 100000) + 100000)
+        code: req.body.code
     });
     const err = attendanceCode.validateSync();
     if (err) return res.status(400).send("Object validation failed.");
