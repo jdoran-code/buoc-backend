@@ -45,10 +45,7 @@ const Person = mongoose.model('Person', personSchema);
 router.get('/', async (req, res) => {
     if (!req.query.name || !req.query.email) return res.status(400).send("Invalid query request.");
 
-    const person = await Person
-        .find({ name: req.query.name, email: req.query.email })
-        .select({ name: 1, email: 1, points: 1 });
-    if (person.length === 0) return res.status(404).send('There is no person with the given name and email.');
+    const person = await Person.find({ name: req.query.name, email: req.query.email })
     res.send(person);
 });
 
@@ -75,7 +72,7 @@ router.put('/:id', async (req, res) => {
     if (req.body.isMember) person.isMember = req.body.isMember;
     if (req.body.numWaitlists) person.numWaitlists = req.body.numWaitlists;
     if (req.body.meetingsAttended) person.meetingsAttended = req.body.meetingsAttended;
-    if (req.body.points) person.points = req.body.points;
+    if (req.body.points) person.points = req.body.meetingsAttended;
 
     const err = person.validateSync();
     if (err) return res.status(400).send("Update validation failed.");

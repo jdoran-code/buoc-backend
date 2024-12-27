@@ -20,8 +20,7 @@ router.get('/', async (req, res) => {
     const attendanceCode = await AttendanceCode
         .find()
         .sort({ date: -1 })
-        .limit(1)
-        .select({ _id: 0, code: 1 });
+        .limit(1);
     res.send(attendanceCode);
 });
 
