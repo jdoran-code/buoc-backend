@@ -51,6 +51,14 @@ const eventSchema = new mongoose.Schema({
         min: 0,
         max: 9
     },
+    isDifficultHike: {
+        type: Boolean,
+        required: function() { return this.isTrip; }
+    },
+    bonusQuestion: {
+        type: String,
+        required: function() { return this.isTrip; }
+    },
     numSeats: {
         type: Number,
         min: 1,
@@ -81,7 +89,10 @@ const Event = mongoose.model('Event', eventSchema);
 router.get('/', async (req, res) => {
     if (req.query.organizer) {
         const events = await Event
-            .find({ organizer: req.query.organizer })
+            .find({ 
+                organizer: req.query.organizer,
+                date: { $gte: new Date() }
+             })
             .sort({ date: -1 });
         if (events.length === 0) res.status(404).send("There are no events with the given organizer");
         res.send(events);
@@ -101,6 +112,8 @@ router.post('/', async (req, res) => {
         numDays: req.body.numDays,
         isTrip: req.body.isTrip,
         signupForm: req.body.signupForm,
+        isDifficultHike: req.body.isDifficultHike,
+        bonusQuestion: req.body.bonusQuestion,
         numSeats: req.body.numSeats,
         prospectList: req.body.prospectList,
         waitlist: req.body.waitlist,
