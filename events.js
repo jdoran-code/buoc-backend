@@ -87,14 +87,14 @@ const eventSchema = new mongoose.Schema({
 const Event = mongoose.model('Event', eventSchema);
 
 router.get('/', async (req, res) => {
-    if (req.query.organizer) {
+    if (req.query.signupForm) {
         const events = await Event
-            .find({ 
-                organizer: req.query.organizer,
-                date: { $gte: new Date() }
+            .find({
+                isTrip: true, 
+                signupForm: Number(req.query.signupForm)
              })
             .sort({ date: -1 });
-        if (events.length === 0) res.status(404).send("There are no events with the given organizer");
+        if (events.length === 0) return res.status(404).send("There are no events with the given signup form hash");
         res.send(events);
     } else {
         const events = await Event
