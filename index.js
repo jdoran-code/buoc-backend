@@ -6,6 +6,7 @@ const people = require('./people');
 const auth = require('./auth');
 const attendanceCodes = require('./attendanceCodes');
 const submissions = require('./submissions');
+const formStates = require('./formStates');
 const express = require('express');
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/api/people', people);
 app.use('/api/auth', auth);
 app.use('/api/attendanceCodes', attendanceCodes);
 app.use('/api/submissions', submissions);
+app.use('/api/formStates', formStates);
 
 
 const port = process.env.PORT || 3000;
