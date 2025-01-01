@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 
-const formStateSchema = new mongoose.Schema({
+const formOpenerSchema = new mongoose.Schema({
     signupForm: {
         type: Number,
         required: true
@@ -13,40 +13,40 @@ const formStateSchema = new mongoose.Schema({
     }
 });
 
-const FormState = mongoose.model('FormState', formStateSchema);
+const FormOpener = mongoose.model('FormOpener', formOpenerSchema);
 
 router.get('/', async (req, res) => {
     if (!req.query.signupForm) return res.status(400).send("Invalid query request");
 
-    const formState = await FormState.find({ signupForm: req.query.signupForm });
-    res.send(formState);
+    const formOpener = await FormOpener.find({ signupForm: req.query.signupForm });
+    res.send(formOpener);
 });
 
 router.post('/', async (req, res) => {
-    let formState = new FormState({
+    let formOpener = new FormOpener({
         signupForm: req.body.signupForm,
         isOpen: req.body.isOpen
     });
-    const err = formState.validateSync();
+    const err = formOpener.validateSync();
     if (err) return res.status(400).send("Object validation failed.");
 
-    formState = await formState.save();
-    res.send(formState);
+    formOpener = await formOpener.save();
+    res.send(formOpener);
 });
 
 router.put('/:id', async (req, res) => {
     if (req.body.isOpen == undefined) return res.status(400).send("Invalid request body.");
     
-    let formState = await FormState.findByIdAndUpdate(req.params.id, {
+    let formOpener = await FormOpener.findByIdAndUpdate(req.params.id, {
         $set: {
             isOpen: req.body.isOpen
         }
     }, { new: true });
-    res.send(formState);
+    if (formOpener) res.send(formOpener);
 });
 
 router.delete('/', async (req, res) => {
-    const deletion = await FormState.deleteMany();
+    const deletion = await FormOpener.deleteMany();
     numDeleted = deletion.deletedCount;
     if (numDeleted === 1) {
         res.send(`1 document deleted.`);
