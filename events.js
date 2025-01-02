@@ -51,6 +51,10 @@ const eventSchema = new mongoose.Schema({
         min: 0,
         max: 9
     },
+    signupsComplete: {
+        type: Boolean,
+        required: function() { return this.isTrip; }
+    },
     isDifficultHike: {
         type: Boolean,
         required: function() { return this.isTrip; }
@@ -112,6 +116,7 @@ router.post('/', async (req, res) => {
         numDays: req.body.numDays,
         isTrip: req.body.isTrip,
         signupForm: req.body.signupForm,
+        signupsComplete: req.body.signupsComplete,
         isDifficultHike: req.body.isDifficultHike,
         bonusQuestion: req.body.bonusQuestion,
         numSeats: req.body.numSeats,
@@ -133,6 +138,7 @@ router.put('/:id', async (req, res) => {
     if (req.body.title) event.title = req.body.title;
     if (req.body.date) event.date = req.body.date;
     if (req.body.numDays) event.numDays = req.body.numDays;
+    if (req.body.signupsComplete !== undefined) event.signupsComplete = req.body.signupsComplete;
     if (req.body.numSeats) event.numSeats = req.body.numSeats;
     if (req.body.waitlist) event.waitlist = req.body.waitlist;
     if (req.body.tripRoster) event.tripRoster = req.body.tripRoster;
