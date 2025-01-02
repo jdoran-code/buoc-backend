@@ -29,19 +29,15 @@ const submissionSchema = new mongoose.Schema({
     signupForm: {
         type: Number,
         required: true
-    },
-    formInstance: {
-        type: Number,
-        required: true
     }
 });
 
 const Submission = mongoose.model('Submission', submissionSchema);
 
 router.get('/', async (req, res) => {
-    if (!req.query.formInstance) return res.status(400).send("Invalid query request");
+    if (!req.query.signupForm) return res.status(400).send("Invalid query request");
 
-    const submissions = await Submission.find({ formInstance: req.query.formInstance });
+    const submissions = await Submission.find({ signupForm: req.query.signupForm });
     res.send(submissions);
 });
 
@@ -51,8 +47,7 @@ router.post('/', async (req, res) => {
         email: req.body.email,
         experience: req.body.experience,
         bonusAnswer: req.body.bonusAnswer,
-        signupForm: req.body.signupForm,
-        formInstance: req.body.formInstance
+        signupForm: req.body.signupForm
     });
     const err = submission.validateSync();
     if (err) return res.status(400).send("Object validation failed.");
@@ -62,7 +57,9 @@ router.post('/', async (req, res) => {
 });
 
 router.delete('/', async (req, res) => {
-    const deletion = await Submission.deleteMany();
+    if (req.body.signupForm === undefined) return res.status(400).send("Invalid request body.");
+
+    const deletion = await Submission.deleteMany({ signupForm: req.body.signupForm });
     numDeleted = deletion.deletedCount;
     if (numDeleted === 1) {
         res.send(`1 document deleted.`);

@@ -69,10 +69,10 @@ router.put('/:id', async (req, res) => {
     let person = await Person.findById(req.params.id);
     if (!person) return res.status(404).send('There is no person with the given id.');
 
-    if (req.body.isMember) person.isMember = req.body.isMember;
+    if (req.body.isMember != undefined) person.isMember = req.body.isMember;
     if (req.body.numWaitlists) person.numWaitlists = req.body.numWaitlists;
     if (req.body.meetingsAttended) person.meetingsAttended = req.body.meetingsAttended;
-    if (req.body.points) person.points = req.body.meetingsAttended;
+    if (req.body.points) person.points = req.body.points;
 
     const err = person.validateSync();
     if (err) return res.status(400).send("Update validation failed.");
