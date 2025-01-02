@@ -36,6 +36,10 @@ const eventSchema = new mongoose.Schema({
         type: Date, 
         required: true 
     },
+    dateCreated: {
+        type: Date,
+        required: true
+    },
     numDays: {
         type: Number,
         required: true,
@@ -103,7 +107,7 @@ router.get('/', async (req, res) => {
     } else {
         const events = await Event
             .find()
-            .sort({ date: -1 });
+            .sort({ dateCreated: -1 });
         res.send(events);
     }
 });
@@ -113,6 +117,7 @@ router.post('/', async (req, res) => {
         organizer: req.body.organizer,
         title: req.body.title,
         date: req.body.date,
+        dateCreated: new Date(),
         numDays: req.body.numDays,
         isTrip: req.body.isTrip,
         signupForm: req.body.signupForm,
