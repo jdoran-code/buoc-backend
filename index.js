@@ -5,7 +5,6 @@ const events = require('./events');
 const people = require('./people');
 const auth = require('./auth');
 const attendanceCodes = require('./attendanceCodes');
-const submissions = require('./submissions');
 const formOpeners = require('./formOpeners');
 const express = require('express');
 const app = express();
@@ -25,7 +24,6 @@ app.use('/api/events', events);
 app.use('/api/people', people);
 app.use('/api/auth', auth);
 app.use('/api/attendanceCodes', attendanceCodes);
-app.use('/api/submissions', submissions);
 app.use('/api/formOpeners', formOpeners);
 
 
