@@ -43,9 +43,9 @@ const personSchema = new mongoose.Schema({
 const Person = mongoose.model('Person', personSchema);
 
 router.get('/', async (req, res) => {
-    if (!req.query.name || !req.query.email) return res.status(400).send("Invalid query request.");
+    if (!req.query.email) return res.status(400).send("Invalid query request.");
 
-    const person = await Person.find({ name: req.query.name, email: req.query.email })
+    const person = await Person.find({ email: req.query.email })
     res.send(person);
 });
 
