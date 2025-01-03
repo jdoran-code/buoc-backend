@@ -140,11 +140,13 @@ router.put('/:id', async (req, res) => {
     let event = await Event.findById(req.params.id);
     if (!event) return res.status(404).send('There is no event with the given id.');
 
+    if (req.body.submission) event.prospectList.push(req.body.submission);
     if (req.body.title) event.title = req.body.title;
     if (req.body.date) event.date = req.body.date;
     if (req.body.numDays) event.numDays = req.body.numDays;
     if (req.body.signupsComplete !== undefined) event.signupsComplete = req.body.signupsComplete;
     if (req.body.numSeats) event.numSeats = req.body.numSeats;
+    if (req.body.prospectList) event.prospectList = req.body.prospectList;
     if (req.body.waitlist) event.waitlist = req.body.waitlist;
     if (req.body.tripRoster) event.tripRoster = req.body.tripRoster;
 
