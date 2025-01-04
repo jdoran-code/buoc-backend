@@ -78,7 +78,7 @@ router.put('/:id', async (req, res) => {
     if (!person) return res.status(404).send('There is no person with the given id.');
 
     if (req.body.isMember != undefined) person.isMember = req.body.isMember;
-    if (req.body.numWaitlists) person.numWaitlists = req.body.numWaitlists;
+    if (req.body.numWaitlists != undefined) person.numWaitlists = req.body.numWaitlists;
     if (req.body.meetingsAttended) person.meetingsAttended = req.body.meetingsAttended;
     if (req.body.points) person.points = req.body.points;
 
