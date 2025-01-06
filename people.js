@@ -80,7 +80,7 @@ router.put('/:id', async (req, res) => {
     if (req.body.isMember != undefined) person.isMember = req.body.isMember;
     if (req.body.numWaitlists != undefined) person.numWaitlists = req.body.numWaitlists;
     if (req.body.meetingsAttended) person.meetingsAttended = req.body.meetingsAttended;
-    if (req.body.points) person.points = req.body.points;
+    if (req.body.points != undefined) person.points = req.body.points;
 
     const err = person.validateSync();
     if (err) return res.status(400).send("Update validation failed.");
